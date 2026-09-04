@@ -7,7 +7,7 @@
 **Dashboard:** [View the live Looker Studio dashboard](https://datastudio.google.com/reporting/67a830e6-ae0a-49d1-b7db-6feed31e4413)
 **Full write-up (PDF, styled version):** [GA4_Case_Study.pdf](GA4_Case_Study.pdf)
 
-![Full Dashboard](screenshots/dashboard-full.png)
+![Full Dashboard](dashboard-full.png)
 
 ---
 
