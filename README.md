@@ -5,7 +5,7 @@
 **Data source:** Google Analytics 4 Demo Account — Google Merchandise Store
 **Tools:** GA4 Explorations, GA4 Advertising Attribution, Looker Studio
 **Dashboard:** [View the live Looker Studio dashboard](https://datastudio.google.com/reporting/67a830e6-ae0a-49d1-b7db-6feed31e4413)
-**Full write-up (.Docx, styled version):** [GA4 Case Study (.docx)] (GA4_Case_Study.docx)
+**Full write-up (.Docx, styled version):** [GA4 Case Study (.docx)](screenshots/GA4_Case_Study.docx)
 ![Full Dashboard](dashboard-full.png)
 
 ---
