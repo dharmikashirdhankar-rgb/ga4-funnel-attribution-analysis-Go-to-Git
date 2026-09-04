@@ -1,8 +1,11 @@
-# GA4 Marketing Funnel & Attribution Analysis
+# Which Channels Actually Drive Revenue?
 
-**Dataset:** Google Analytics 4 Demo Account — Google Merchandise Store (public e-commerce property)
-**Tools used:** Google Analytics 4 (Explorations, Advertising → Attribution), Looker Studio
-**Live dashboard:** [Insert your shared Looker Studio link here]
+**A funnel and attribution analysis of GA4 e-commerce data**
+
+**Data source:** Google Analytics 4 Demo Account — Google Merchandise Store
+**Tools:** GA4 Explorations, GA4 Advertising Attribution, Looker Studio
+**Dashboard:** [View the live Looker Studio dashboard](https://datastudio.google.com/reporting/67a830e6-ae0a-49d1-b7db-6feed31e4413)
+**Full write-up (PDF, styled version):** [GA4_Case_Study.pdf](GA4_Case_Study.pdf)
 
 ![Full Dashboard](screenshots/dashboard-full.png)
 
@@ -10,23 +13,29 @@
 
 ## The Question
 
-Which marketing channels are actually driving conversions — and which ones are being undervalued by standard last-click reporting?
+Most teams I've seen lean on last-click attribution because it's the default and it's simple to explain in a meeting: whoever got the final click gets the credit. The problem is that it quietly writes off everything that happened before that last click — the ad someone half-noticed, the search that brought them back a second time, the friend who sent them a link. I wanted to know whether that blind spot was actually hiding anything meaningful in a real dataset, or whether it was a theoretical concern that doesn't change much in practice.
 
-Most teams default to last-click attribution because it's simple, but it only rewards whichever channel happened to be clicked right before a purchase, ignoring everything that led up to it. This project set out to test whether that default view was hiding real performance from certain channels.
+So I picked one channel-level question to chase: which channels look weaker than they really are once you stop counting only the last click?
 
 ---
 
 ## Method
 
-I used the public GA4 demo account (Google Merchandise Store) to build a purchase funnel and segment it by channel using GA4 Explorations. I then compared Last Click vs Data-Driven attribution models in GA4's Advertising → Attribution report to see where they diverged, and pulled channel-level session, conversion, and conversion-rate data into a Looker Studio dashboard to visualize the findings.
+I worked entirely inside GA4's demo e-commerce property (the Google Merchandise Store), which gave me a real, reasonably large dataset without needing my own site traffic. The approach had three parts:
+
+- Built a purchase funnel in GA4 Explorations — session start through purchase — and broke it down by channel.
+- Pulled GA4's built-in comparison of Last Click vs. Data-Driven attribution to see where the two models disagreed on revenue by channel.
+- Used GA4's attribution path data to check where each channel actually sits in a user's journey — early, middle, or right before conversion — to explain *why* the models disagreed, not just that they did.
+
+Everything below is pulled directly from the dashboard, built in Looker Studio.
 
 ---
 
-## Key Findings
+## What I Found
 
-### 1. Steep drop-off happens early in the funnel, not at checkout
+### 1. The funnel doesn't leak at checkout — it leaks before anyone even looks at a product
 
-| Stage | Users | % of previous stage |
+| Stage | Users | % who made it from the prior stage |
 |---|---|---|
 | Session Start | 90,135 | — |
 | View Item | 19,324 | 21.4% |
@@ -34,36 +43,50 @@ I used the public GA4 demo account (Google Merchandise Store) to build a purchas
 | Begin Checkout | 2,250 | 50.5% |
 | Purchase | 1,137 | 50.5% |
 
-The single biggest drop-off is between **Session Start and View Item** — nearly 4 in 5 users never even view a product. Once someone reaches checkout, they convert to purchase roughly half the time, which is actually a fairly healthy completion rate. This suggests the bigger opportunity isn't fixing checkout friction — it's improving product discoverability and landing page relevance so more sessions turn into product views in the first place.
+The steepest cliff in this whole funnel is the very first step: roughly four out of five sessions never even get to a product page. Once someone actually reaches checkout, though, they finish the purchase about half the time — which is a genuinely solid completion rate. That tells me the real opportunity here isn't a smoother checkout flow. It's getting more of those early sessions to a relevant product in the first place — better landing pages, better search relevance, that kind of thing.
 
-### 2. Referral traffic is undervalued by last-click attribution
+### 2. Referral is worth more than last-click reporting says it is
 
 | Channel | Last Click Revenue | Data-Driven Revenue | Change |
 |---|---|---|---|
-| Referral | $8,416.14 | $10,483.86 | **+24.6%** |
+| **Referral** | **$8,416.14** | **$10,483.86** | **+24.6%** |
 | Paid Search | $6,077.35 | $6,861.29 | +12.9% |
 | Direct | $113,128.37 | $113,128.37 | 0% (no upstream channel) |
 | Organic Search | $71,394.19 | $68,634.80 | −3.9% |
 
-When comparing GA4's Data-Driven attribution model (which distributes credit across a user's full path) against Last Click, **referral traffic is undervalued by nearly 25%**. This means referral is playing a meaningful assisting role in conversions — bringing users back or nudging them along their path — that a last-click-only view completely misses.
+Referral is the standout here. Under Data-Driven attribution — which spreads credit across a user's whole path instead of handing it all to the last click — Referral's revenue jumps by almost a quarter. That's a real signal that referral traffic is doing more work than a last-click dashboard would ever show: bringing people back, nudging them along, even if it isn't usually the channel that closes the sale.
 
-### 3. Why the attribution models disagree: Referral shows up early and mid-journey nearly twice as often as average
+### 3. Here's why: referral shows up early far more than most channels
 
-GA4's Key Event Attribution Paths report breaks every touchpoint across all conversion paths into three buckets — Early, Mid, and Late (i.e. the final touch before conversion) — and shows exactly where each channel shows up:
+The obvious next question was *why*. GA4's attribution path data actually breaks this down — it tags every touchpoint across every conversion path as Early, Mid, or Late (Late meaning the final click before purchase), so you can see exactly where each channel tends to show up.
 
-| Stage | All Channels (avg. share) | Referral (share of its own touchpoints) |
+![Key event attribution paths overview](screenshots/attribution-paths-overview.png)
+
+Hovering over Referral's bar in each of the three panels gives the exact conversion credit behind those percentages:
+
+<table>
+<tr>
+<td><img src="screenshots/referral-early-touchpoints.png" width="260"/></td>
+<td><img src="screenshots/referral-mid-touchpoints.png" width="260"/></td>
+<td><img src="screenshots/referral-late-touchpoints.png" width="260"/></td>
+</tr>
+</table>
+
+| Journey stage | All channels (average) | Referral |
 |---|---|---|
-| Early | 5.68% | 14.0% (692.39 of 4,943.32 credits) |
-| Mid | 4.00% | 3.9% (190.38 of 4,943.32 credits) |
-| Late | 90.32% | 82.1% (4,060.55 of 4,943.32 credits) |
+| Early touchpoint | 5.68% | 14.0% (692.39 of 4,943.32 credits) |
+| Mid touchpoint | 4.00% | 3.9% (190.38 of 4,943.32 credits) |
+| Late touchpoint (final click) | 90.32% | 82.1% (4,060.55 of 4,943.32 credits) |
 
-Combining Early + Mid: **17.9% of Referral's touchpoints occur before the final click, compared to a 9.68% average across all channels** — nearly double. This is the direct mechanical explanation for the attribution divergence in Finding 2: Last Click attribution only ever counts a channel's final touchpoint, so it structurally misses Referral's above-average role in initiating or assisting a conversion earlier in the journey. Data-Driven attribution counts all of it, which is exactly why it credits Referral 24.6% more revenue than Last Click does.
+Add up Early and Mid, and referral shows up before the final click **17.9%** of the time — against a **9.68%** average across every other channel. That's nearly double. And it's the actual mechanical reason behind Finding 2: last-click attribution structurally can't see any of that early involvement, because it only ever looks at the final touch. Data-driven attribution does see it, which is exactly why it credits referral almost 25% more.
 
-### 4. Referral also converts well on its own merits
+### 4. And referral converts well on its own, independent of any of this
 
-| Channel | Sessions | Purchases | Conversion Rate |
+One more check, mostly to see whether this held up outside the attribution modeling entirely: plain conversion rate by channel, sessions to purchase.
+
+| Channel | Sessions | Purchases | Conversion rate |
 |---|---|---|---|
-| Organic Video | 57 | 3 | 5.26%* |
+| Organic Video* | 57 | 3 | 5.26% |
 | Organic Shopping | 469 | 13 | 2.77% |
 | **Referral** | **1,734** | **46** | **2.65%** |
 | Organic Social | 890 | 11 | 1.24% |
@@ -73,27 +96,25 @@ Combining Early + Mid: **17.9% of Referral's touchpoints occur before the final 
 | Unassigned | 6,069 | 39 | 0.64% |
 | Paid Search | 10,387 | 42 | 0.40% |
 
-*Organic Video's 5.26% rate is based on a very small sample (57 sessions) and shouldn't be read as a reliable signal.
+*Organic Video's rate is based on only 57 sessions — too small a sample to draw much from.
 
-Excluding low-volume outliers, **Referral is the strongest-converting channel at meaningful scale** — nearly 2.8x the conversion rate of Direct traffic, despite Direct driving far more raw revenue overall. This corroborates both prior findings: Referral isn't just under-credited in attribution reporting, it's genuinely a high-quality channel on a per-session basis too.
-
-By contrast, **Direct and Paid Search drive high session volume but convert relatively poorly per session** (0.96% and 0.40%), suggesting volume and channel quality aren't the same thing.
+Setting aside that small-sample outlier, referral is the best-converting channel at any meaningful scale — nearly three times Direct's rate, even though Direct brings in far more total revenue. Meanwhile Direct and Paid Search, the two channels with the most traffic, both convert under 1%. Volume and quality clearly aren't the same thing here.
 
 ---
 
-## Recommendation
+## What I'd Tell a Marketing Team
 
-If I were advising a marketing team on this data, I'd suggest:
+**Stop judging referral by last-click alone.** Its real contribution is roughly a quarter higher than last-click reporting shows, and it converts better than almost anything else at scale. If there's room to invest more in partner or affiliate relationships, this is where I'd start.
 
-1. **Don't evaluate referral partnerships using last-click numbers alone.** Its true contribution is roughly 25% higher than last-click reporting shows — because it plays an early/mid-journey role nearly twice as often as the average channel — and it independently converts at a materially higher rate than Direct or Paid Search. Referral is a strong candidate for further investment (e.g., expanding partner/affiliate relationships) that a last-click-only dashboard would likely miss.
-2. **Focus funnel optimization efforts upstream, not at checkout.** The largest single drop-off happens between landing (Session Start) and product view — the checkout-to-purchase step is already reasonably efficient. Improving product recommendations, search relevance, or landing page targeting would likely have more impact than checkout UX changes.
-3. **Re-evaluate Paid Search spend efficiency.** It drives meaningful volume (10,387 sessions) but the lowest conversion rate of any channel with real scale (0.40%) — worth investigating whether targeting or landing page match is off.
+**Put optimization effort at the top of the funnel, not checkout.** The checkout-to-purchase step is already working fine. The real loss is upstream — most sessions never even reach a product page, so landing pages and search relevance are the higher-leverage fix.
+
+**Take a harder look at paid search efficiency.** It's pulling in more traffic than almost any channel except direct and organic search, but it converts at the lowest rate of any channel with real volume. Worth checking whether targeting or landing pages are actually matching the intent behind the ads.
 
 ---
 
-## Notes on the data
+## A Note on the Data
 
-This analysis uses GA4's public demo e-commerce dataset, not live business data, so findings are illustrative of the *method* rather than actionable for a real company. The same approach (funnel exploration → channel segmentation → attribution model comparison) applies directly to any GA4 property.
+This uses GA4's public demo dataset, not a live business, so treat the findings as a demonstration of the method rather than advice for an actual company. That said, the process — build the funnel, compare attribution models, and then dig into path-level data to explain any gap you find — carries over directly to any real GA4 property.
 
 ---
 
@@ -102,6 +123,11 @@ This analysis uses GA4's public demo e-commerce dataset, not live business data,
 ```
 ga4-funnel-attribution-analysis/
 ├── README.md
+├── GA4_Case_Study.pdf
 └── screenshots/
-    └── dashboard-full.png
+    ├── dashboard-full.png
+    ├── attribution-paths-overview.png
+    ├── referral-early-touchpoints.png
+    ├── referral-mid-touchpoints.png
+    └── referral-late-touchpoints.png
 ```
