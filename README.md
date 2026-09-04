@@ -60,15 +60,15 @@ Referral is the standout here. Under Data-Driven attribution — which spreads c
 
 The obvious next question was *why*. GA4's attribution path data actually breaks this down — it tags every touchpoint across every conversion path as Early, Mid, or Late (Late meaning the final click before purchase), so you can see exactly where each channel tends to show up.
 
-![Key event attribution paths overview](screenshots/attribution-paths-overview.png)
+![Key event attribution paths overview](attribution-paths-overview.png)
 
 Hovering over Referral's bar in each of the three panels gives the exact conversion credit behind those percentages:
 
 <table>
 <tr>
-<td><img src="screenshots/referral-early-touchpoints.png" width="260"/></td>
-<td><img src="screenshots/referral-mid-touchpoints.png" width="260"/></td>
-<td><img src="screenshots/referral-late-touchpoints.png" width="260"/></td>
+<td><img src="referral-early-touchpoints.png" width="260"/></td>
+<td><img src="referral-mid-touchpoints.png" width="260"/></td>
+<td><img src="referral-late-touchpoints.png" width="260"/></td>
 </tr>
 </table>
 
